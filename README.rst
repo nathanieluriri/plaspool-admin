@@ -202,6 +202,45 @@ Command                      Effect
 ===========================  ================================================
 
 
+Local demo
+==========
+
+A complete shop on one machine, for screenshots, recordings and trying things
+out. It needs no ``.env``, no Postgres server and no network after the first
+run, and nothing in it can reach production.
+
+.. code-block:: bash
+
+   npm run demo            # API on :8787; seeds .demo-db/ on first run
+   npm run demo:console    # the console on :5173 (second terminal)
+
+Then open http://localhost:5173/api/__demo/sign-in to be signed in as the demo
+owner (``?as=writer|supply|support|marketing|developer`` for the other roles).
+The storefront runs against the same API with ``npm run demo`` in
+``plaspool-storefront``, and
+http://localhost:8787/api/__demo/shop-sign-in?as=chioma signs a demo shopper in
+there.
+
+What it is made of:
+
+- **The real app.** ``scripts/demo/server.ts`` serves ``createApp()`` on an
+  embedded Postgres (PGlite, as the test suite uses) with the real migrations.
+  Image bytes live in ``.demo-db/objects`` instead of R2, payments go through
+  the suite's ``FakeProvider`` (checkout's Pay now comes straight back as
+  paid), and every email is written to ``.demo-db/mail`` as HTML.
+- **The live catalogue and journal.** The first run reads the public products,
+  photographs, prices, bulk tiers, add-on, rewards programme, banner,
+  collection districts, delivery form and posts from ``admin.plaspool.com``
+  with GET requests only, and keeps them in ``.demo-db/live``.
+- **Three weeks of invented trading,** driven through the real routes on a
+  moved clock: customers, orders, parcels, mystery boxes, reviews, spool
+  returns, points and hand-recorded sales. Every person is invented and every
+  address is ``@example.com``.
+
+``npm run demo:reset`` wipes and reseeds, reusing ``.demo-db/live``; delete
+that folder too to read the live site again.
+
+
 License
 =======
 
