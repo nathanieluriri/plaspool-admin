@@ -66,6 +66,9 @@ async function rewardsProgramme(owner: Browser): Promise<string> {
     unitLabelPlural: live.unitLabelPlural,
     minUnitsPerReturn: live.minUnitsPerReturn,
     pointsPerUnit: live.pointsPerUnit,
+    // What a returned spool costs in points paid out, at the ₦100 a point the
+    // storefront's returns intro states; the Spools analytics read it.
+    unitCostMinor: live.pointsPerUnit * 10_000,
   });
   return programme.id;
 }
