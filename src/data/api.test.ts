@@ -455,6 +455,15 @@ describe('transient', () => {
     expect(err).toBeInstanceOf(OfflineError);
     expect(err).toMatchObject({ status: 0, transient: true });
   });
+
+  it("lets the caller's own abort through as an AbortError, not as offline", async () => {
+    const controller = new AbortController();
+    controller.abort();
+    fetchMock.mockRejectedValue(new DOMException('The operation was aborted.', 'AbortError'));
+    const err = await refused(() => apiFetch('/posts/p_1', { signal: controller.signal }));
+    expect(err).not.toBeInstanceOf(OfflineError);
+    expect(err).toMatchObject({ name: 'AbortError' });
+  });
 });
 
 // ------------------------------------------------------------------- the body

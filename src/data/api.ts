@@ -220,14 +220,18 @@ export async function apiFetch<T>(path: string, opts: RequestOptions = {}): Prom
       body: hasBody ? JSON.stringify(opts.body) : undefined,
       signal: opts.signal,
     });
-  } catch {
+  } catch (cause) {
     /*
      * `fetch` rejects for DNS, a refused connection, a dropped link and CORS —
      * i.e. every case where the request got no answer at all. It is NOT a 5xx:
      * plan §2.2 I3 clears the cache on a 401 at boot and never on a network
      * failure, so a dropped connection reported as an authoritative refusal
      * would delete a writer's whole offline library.
+     *
+     * The caller's own abort is neither, and every screen that passes a signal
+     * tells it apart by the DOMException, so it goes through untouched.
      */
+    if (opts.signal?.aborted) throw cause;
     throw new OfflineError();
   }
 
